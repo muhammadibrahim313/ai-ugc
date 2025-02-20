@@ -1,5 +1,5 @@
 import { getOpenAI } from "@/lib/ai";
-import { extractStructuredScriptPrompt, generateScriptPrompt } from "./prompts";
+import { generateScriptPrompt } from "./prompts";
 import {
   ExtractStructuredScriptSchema,
   extractStructuredScriptSchema,
