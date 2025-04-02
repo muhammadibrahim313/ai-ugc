@@ -19,11 +19,11 @@ export function ProductGallery({ images }: ProductGalleryProps) {
   return images === undefined ? (
     <Skeleton className="w-full h-[500px]" />
   ) : (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <motion.div
         className={cn(
           "relative aspect-square rounded-lg overflow-hidden",
-          "bg-background/30 border border-sidebar-border",
+          "bg-background/10 border border-border/60 shadow-sm",
           "group cursor-zoom-in",
           isZoomed && "cursor-zoom-out",
         )}
@@ -51,17 +51,19 @@ export function ProductGallery({ images }: ProductGalleryProps) {
         <div
           className={cn(
             "absolute inset-0 bg-black/0 transition-colors",
-            "group-hover:bg-black/5",
             "flex items-center justify-center",
+            isZoomed ? "opacity-0" : "group-hover:bg-black/5",
           )}
         >
-          <ZoomIn
-            className={cn(
-              "w-6 h-6 text-white opacity-0 transition-opacity",
-              "drop-shadow-lg",
-              "group-hover:opacity-100",
-            )}
-          />
+          {!isZoomed && (
+            <ZoomIn
+              className={cn(
+                "w-6 h-6 text-foreground/80 opacity-0 transition-opacity",
+                "drop-shadow-sm",
+                "group-hover:opacity-70",
+              )}
+            />
+          )}
         </div>
       </motion.div>
 
@@ -72,9 +74,9 @@ export function ProductGallery({ images }: ProductGalleryProps) {
             onClick={() => setSelectedImage(index)}
             className={cn(
               "relative aspect-square rounded-md overflow-hidden transition-all duration-200",
-              "border border-sidebar-border bg-background/30",
-              "hover:border-fuchsia-500/50",
-              index === selectedImage && "ring-2 ring-fuchsia-500",
+              "border border-border/60 bg-background/10",
+              "hover:border-primary/30 hover:shadow-sm",
+              index === selectedImage && "ring-1 ring-primary/50 shadow-sm",
             )}
           >
             <img

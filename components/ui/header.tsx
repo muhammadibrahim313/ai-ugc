@@ -15,6 +15,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { ThemeToggle } from "@/components/ui/theme-toggle"
 import { usePathname } from "next/navigation"
 import Link from "next/link"
 import _ from "lodash"
@@ -74,7 +75,7 @@ export function Header() {
     }
 
     return (
-        <header className="bg-background flex h-16 shrink-0 items-center gap-2">
+        <header className="bg-background flex h-16 shrink-0 items-center justify-between">
             <div className="flex items-center gap-2 px-4">
                 <SidebarTrigger className="-ml-1" />
                 <Separator orientation="vertical" className="mr-2 h-4" />
@@ -99,6 +100,9 @@ export function Header() {
                         })}
                     </BreadcrumbList>
                 </Breadcrumb>
+            </div>
+            <div className="px-4">
+                <ThemeToggle />
             </div>
         </header>
     )

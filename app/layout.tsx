@@ -46,8 +46,8 @@ export default async function RootLayout({
   const sidebarState = cookieStore.get(SIDEBAR_STATE_COOKIE)?.value === "true";
 
   return (
-    <html lang="en" className="dark">
-      <body suppressHydrationWarning className={`dark:bg-background dark:text-white`}>
+    <html lang="en">
+      <body suppressHydrationWarning className="font-sans antialiased">
         <GlobalProviders>
           <SidebarProvider defaultOpen={sidebarState}>
             <div className="flex h-screen w-[100%]">
@@ -56,7 +56,7 @@ export default async function RootLayout({
                 <div className="h-16 shrink-0">
                   <Header />
                 </div>
-                <main className="flex-1 overflow-auto w-[100%] font-sans antialiased">
+                <main className="flex-1 overflow-auto w-[100%]">
                   {children}
                 </main>
               </div>

@@ -1,20 +1,11 @@
 "use client";
 
 import { useEffect } from "react";
-
-import { Download, Play } from "lucide-react";
-
-import { Button } from "@/components/ui/button";
-
 import { AdSceneList } from "./components/ad-scene-list";
 import { useProductContext } from "../../contexts/product-context";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export type StoryboardViewProps = {
-  onNextStep: () => void;
-};
-
-export function StoryboardView({ onNextStep }: StoryboardViewProps) {
+export function StoryboardView() {
   const {
     storyboard: { refetch, data },
   } = useProductContext();
@@ -30,43 +21,30 @@ export function StoryboardView({ onNextStep }: StoryboardViewProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="space-y-1">
-          <h2 className="text-2xl font-medium">Video Storyboard</h2>
-          <p className="text-sm text-muted-foreground">
-            Plan your video sequence with A-roll and B-roll segments
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2">
-          {/*
-            <Button variant="outline" size="sm" className="text-xs gap-2">
-              <Download className="w-4 h-4" />
-              Export
-            </Button>
-          */}
-          <Button
-            size="sm"
-            className="bg-fuchsia-500 hover:bg-fuchsia-600 text-white text-xs gap-2"
-            disabled={data === undefined}
-            onClick={onNextStep}
-          >
-            <Play className="w-4 h-4" />
-            Generate
-          </Button>
-        </div>
-      </div>
-
       {data === undefined ? (
-        <Skeleton className="w-full h-[500px]" />
+        <div className="space-y-8">
+          {[1, 2, 3].map((index) => (
+            <div key={index} className="rounded-lg border p-6 space-y-4">
+              <div className="flex items-center justify-between">
+                <Skeleton className="h-6 w-24" />
+                <Skeleton className="h-8 w-8 rounded-full" />
+              </div>
+              <Skeleton className="h-4 w-full" />
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-3/4" />
+                <Skeleton className="h-4 w-1/2" />
+              </div>
+            </div>
+          ))}
+        </div>
       ) : (
         <div className="rounded-lg">
           <AdSceneList
-            scenes={data.structured_script!.map((scene, index) => ({
+            scenes={data.structured_script!.map((scene, index: number) => ({
               id: index,
               roll_type: scene.roll_type,
               content: scene.content,
-              description: scene.content,
+              description: scene.description,
             }))}
             onAddScene={handleAddScene}
           />

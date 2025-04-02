@@ -12,11 +12,7 @@ import { cn } from "@/lib/utils";
 
 import { useProductContext } from "../../contexts/product-context";
 
-export type InfluencersViewProps = {
-  onNextStep: () => void;
-};
-
-export function InfluencersView({ onNextStep }: InfluencersViewProps) {
+export function InfluencersView() {
   const [searchQuery, setSearchQuery] = useState("");
 
   const {
@@ -86,16 +82,6 @@ export function InfluencersView({ onNextStep }: InfluencersViewProps) {
               )}
             />
           </div>
-          <Button
-            onClick={onNextStep}
-            className={cn(
-              "bg-fuchsia-500 text-white",
-              "hover:bg-fuchsia-600",
-            )}
-            disabled={selectedInfluencerId === undefined}
-          >
-            Generate script
-          </Button>
         </div>
       </div>
 
@@ -279,12 +265,6 @@ export function InfluencersView({ onNextStep }: InfluencersViewProps) {
                               }
                             </span>
                           </div>
-                          {/* <div> */}
-                          {/*   <span className="text-muted-foreground">Posts:</span> */}
-                          {/*   <span className="ml-1.5 font-medium"> */}
-                          {/*     {influencer.recentPosts} */}
-                          {/*   </span> */}
-                          {/* </div> */}
                         </div>
                       </div>
                     </>

@@ -1,156 +1,83 @@
-import { Users, Target, Crosshair } from "lucide-react";
-
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { ChevronRight } from "lucide-react";
 
 import { useProductContext } from "../../contexts/product-context";
 import { Skeleton } from "@/components/ui/skeleton";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import { SourceIcon } from "./components/source-icon";
 
-export type MarketStrategyViewProps = {
-  onNextStep: () => void;
-};
+function BulletList({ items }: { items: string[] }) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      {items.map((item, i) => (
+        <span key={i} className="text-xs text-muted-foreground">• {item}</span>
+      ))}
+    </div>
+  );
+}
 
-export function MarketStrategyView({ onNextStep }: MarketStrategyViewProps) {
+// Sleek collapsible section component
+function CollapsibleSection({
+  title,
+  children,
+  defaultOpen = false,
+  className = ""
+}: {
+  title: string;
+  children: React.ReactNode;
+  defaultOpen?: boolean;
+  className?: string;
+}) {
+  return (
+    <Collapsible
+      defaultOpen={defaultOpen}
+      className={`border rounded-lg bg-muted/30 overflow-hidden ${className}`}
+    >
+      <CollapsibleTrigger className="flex items-center justify-between w-full p-3 text-left">
+        <h3 className="text-sm font-medium">{title}</h3>
+        <div className="text-muted-foreground">
+          <ChevronRight className="h-4 w-4 transition-transform duration-200 data-[state=open]:rotate-90" />
+        </div>
+      </CollapsibleTrigger>
+      <CollapsibleContent className="px-4 py-3 border-t border-t-muted/50">
+        {children}
+      </CollapsibleContent>
+    </Collapsible>
+  );
+}
+
+export function MarketStrategyView() {
   const {
     productResearch: { data },
   } = useProductContext();
 
+  if (data === undefined) {
+    return (
+      <div className="space-y-6 w-full">
+        <Skeleton className="w-full h-[200px]" />
+        <Skeleton className="w-full h-[500px]" />
+      </div>
+    );
+  }
+
+  // Extract data for easier access
+  const { summary, citations } = data;
+  const { market, competition } = summary.detailedAnalysis;
+
   return (
     <div className="space-y-6 w-full">
-      {data === undefined ? (
-        <Skeleton className="w-full h-[200px]" />
-      ) : (
-        <>
-          <div className="space-y-3">
-            <div className="grid grid-cols-3 gap-2">
-              <Card className="bg-background/50 border-sidebar-border">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 p-2">
-                  <CardTitle className="text-[11px] font-medium text-muted-foreground">
-                    Market Size
-                  </CardTitle>
-                  <Users className="h-3 w-3 text-muted-foreground" />
-                </CardHeader>
-                <CardContent className="pt-0 pb-2 px-2">
-                  <div className="text-base font-medium">
-                    {
-                      data.summary.detailedAnalysis.market.primaryMarket
-                        .marketSize
-                    }
-                  </div>
-                </CardContent>
-              </Card>
 
-              <Card className="bg-background/50 border-sidebar-border">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 p-2">
-                  <CardTitle className="text-[11px] font-medium text-muted-foreground">
-                    Target Segments
-                  </CardTitle>
-                  <Target className="h-3 w-3 text-muted-foreground" />
-                </CardHeader>
-                <CardContent className="pt-0 pb-2 px-2">
-                  <div className="text-base font-medium">
-                    {data.summary.detailedAnalysis.market.userPersonas.length}
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-background/50 border-sidebar-border">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 p-2">
-                  <CardTitle className="text-[11px] font-medium text-muted-foreground">
-                    Competitors
-                  </CardTitle>
-                  <Crosshair className="h-3 w-3 text-muted-foreground" />
-                </CardHeader>
-                <CardContent className="pt-0 pb-2 px-2">
-                  <div className="text-base font-medium">
-                    {
-                      data.summary.detailedAnalysis.competition
-                        .directCompetitors.length
-                    }
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Satisfaction Metrics */}
-            <div className="grid grid-cols-5 gap-2">
-              <div className="p-2 bg-muted/50 rounded-lg border flex flex-col">
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-medium text-muted-foreground">
-                    Overall Rating
-                  </span>
-                  <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 text-center">
-                    {
-                      data.summary.detailedAnalysis.painPoints
-                        .satisfactionMetrics.overallRating
-                    }
-                  </span>
-                </div>
-              </div>
-
-              {Object.entries(
-                data.summary.detailedAnalysis.painPoints.satisfactionMetrics
-                  .keyMetrics,
-              ).map(([key, value], index) => {
-                const colors = {
-                  0: {
-                    bg: "bg-blue-500",
-                    text: "text-blue-500",
-                    light: "bg-blue-500/10",
-                  },
-                  1: {
-                    bg: "bg-violet-500",
-                    text: "text-violet-500",
-                    light: "bg-violet-500/10",
-                  },
-                  2: {
-                    bg: "bg-orange-500",
-                    text: "text-orange-500",
-                    light: "bg-orange-500/10",
-                  },
-                };
-                const color = colors[index as keyof typeof colors] || colors[0];
-
-                return (
-                  <div
-                    key={key}
-                    className="p-2 bg-muted/50 rounded-lg border flex flex-col"
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-[11px] font-medium text-muted-foreground">
-                        {key
-                          .split(/(?=[A-Z])/)
-                          .map(
-                            (str) => str.charAt(0).toUpperCase() + str.slice(1),
-                          )
-                          .join(" ")}
-                      </span>
-                      <span
-                        className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${color.light} ${color.text}`}
-                      >
-                        {value}
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-medium">Research Sources</h3>
-              <span className="text-xs text-muted-foreground">
-                {data.citations.length} sources
-              </span>
-            </div>
-
-            <div className="flex flex-wrap gap-2">
-              {data.citations.map((citation, i) => {
+      {/* Research and Quality Section */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-medium">Sources</h3>
+          <span className="text-xs text-muted-foreground">{citations.length} verified sources</span>
+        </div>
+        
+        <div className="relative">
+          <div className="flex overflow-x-auto pb-4 pt-1 -mx-1 no-scrollbar">
+            <div className="flex gap-2 px-1">
+              {citations.map((citation, i) => {
                 const urlMatch = citation.match(/https?:\/\/([^\/]+)/);
                 const domain = urlMatch ? urlMatch[1] : "";
                 const nameMatch = citation.match(/^(.*?)\s*-\s*http/);
@@ -159,404 +86,231 @@ export function MarketStrategyView({ onNextStep }: MarketStrategyViewProps) {
                 return (
                   <div
                     key={i}
-                    className="flex items-center gap-2 shrink-0 border bg-muted/50 px-3 py-1.5 rounded-sm hover:bg-muted/70 transition-colors"
+                    className="flex flex-col items-center justify-center p-3 rounded-md border bg-muted/30 min-w-16 hover:bg-muted/50 transition-colors"
                   >
-                    {/* <div className="relative h-4 w-4 flex-none"> */}
-                    {/*   <SourceIcon domain={domain} name={name} /> */}
-                    {/* </div> */}
-                    <SourceIcon domain={domain} name={name} />
-                    <span className="text-xs text-muted-foreground whitespace-nowrap">
-                      {name}
-                    </span>
+                    <div className="mb-1.5">
+                      <SourceIcon domain={domain} name={name} />
+                    </div>
+                    <span className="text-[10px] text-muted-foreground text-center truncate max-w-24">{name}</span>
                   </div>
                 );
               })}
             </div>
+          </div>
+          <style jsx>{`
+            .no-scrollbar::-webkit-scrollbar {
+              display: none;
+            }
+            .no-scrollbar {
+              -ms-overflow-style: none;
+              scrollbar-width: none;
+            }
+          `}</style>
+        </div>
 
-            <div className="text-xs text-muted-foreground mt-4 pt-4 border-t">
-              <p>
-                All sources have been analyzed and verified for relevance and
-                accuracy.
-              </p>
+        <div className="text-xs text-muted-foreground mt-4 pt-4 border-t">
+          <p>All sources have been analyzed and verified for relevance and accuracy.</p>
+        </div>
+      </div>
+
+      {/* Market Demographics */}
+      <div className="mb-5">
+        <div className="p-4 bg-background/60 rounded-md border shadow-sm">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-medium text-foreground/80">Market Overview</h3>
+            <Badge variant="outline" className="text-xs bg-primary/5 hover:bg-primary/10">
+              {market.primaryMarket.marketSize}
+            </Badge>
+          </div>
+
+          <div className="space-y-3">
+            <div>
+              <p className="text-xs text-muted-foreground mb-2">Demographics</p>
+              <div className="flex flex-wrap gap-1">
+                {market.primaryMarket.demographics.map((demo, i) => (
+                  <Badge key={i} variant="secondary" className="text-[10px] font-normal">
+                    {demo}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <p className="text-xs text-muted-foreground mb-2">Psychographics</p>
+              <div className="flex flex-wrap gap-1">
+                {market.primaryMarket.psychographics.map((psycho, i) => (
+                  <Badge key={i} variant="outline" className="text-[10px] font-normal">
+                    {psycho}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+
+            {market.secondaryMarkets.length > 0 && (
+              <div className="border-t border-border/40 pt-3 mt-1">
+                <p className="text-xs text-muted-foreground mb-2">Secondary Markets</p>
+                <div className="flex flex-wrap gap-1">
+                  {market.secondaryMarkets.map((secondaryMarket, index) => (
+                    <Badge key={index} variant="outline" className="text-[10px] bg-secondary/5">
+                      {secondaryMarket.segment}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Collapsible Content Sections */}
+      <div className="space-y-4">
+        {/* Use Cases Section */}
+        <CollapsibleSection
+          title="Use Cases"
+          defaultOpen={false}
+          className="transition-all duration-200"
+        >
+          {/* Key Insights */}
+          {summary.productSummary.keyInsights.length > 0 && (
+            <div className="mb-5">
+              <h4 className="text-xs font-medium mb-3 text-muted-foreground uppercase tracking-wider">Key Insights</h4>
+              <div className="pl-1">
+                <BulletList items={summary.productSummary.keyInsights} />
+              </div>
+            </div>
+          )}
+
+          {/* Use Cases */}
+          <div className="relative">
+            <div className="flex overflow-x-auto -mx-1 pb-2 no-scrollbar">
+              <div className="flex gap-3 px-1">
+                {market.useCases.map((useCase, index) => (
+                  <div
+                    key={index}
+                    className="p-3 bg-muted/50 rounded-lg border min-w-[260px] max-w-[300px] flex-shrink-0 hover:bg-muted/70 transition-colors"
+                  >
+                    <h4 className="text-sm font-medium mb-2 text-foreground">{useCase.scenario}</h4>
+                    <div className="pl-0.5">
+                      <BulletList items={useCase.benefits} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <style jsx>{`
+              .no-scrollbar::-webkit-scrollbar {
+                display: none;
+              }
+              .no-scrollbar {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+              }
+            `}</style>
+          </div>
+        </CollapsibleSection>
+
+        {/* Target Audience Section */}
+        <CollapsibleSection title="User Personas">
+          <div className="space-y-4">
+            <div className="grid gap-3">
+              {market.userPersonas.map((persona, index) => (
+                <div key={index} className="p-3 bg-muted/40 rounded-lg border">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-sm font-medium text-foreground">{persona.type}</h3>
+                    <Badge variant="outline" className="text-[10px]">Persona</Badge>
+                  </div>
+
+                  <p className="text-xs text-muted-foreground mb-3">{persona.description}</p>
+
+                  <div className="flex flex-wrap gap-1.5">
+                    {persona.needs.map((need, i) => (
+                      <Badge key={i} variant="secondary" className="text-[10px]">{need}</Badge>
+                    ))}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-        </>
-      )}
+        </CollapsibleSection>
 
-      {data === undefined ? (
-        <Skeleton className="w-full h-[500px]" />
-      ) : (
-        <>
-          {/* Main Content */}
-          <Tabs defaultValue="market" className="w-full">
-            <TabsList className="w-full justify-start h-auto gap-2 bg-transparent pb-4">
-              <TabsTrigger
-                value="market"
-                className="data-[state=active]:bg-primary/10 px-3 py-1.5 text-xs"
-              >
-                Market Analysis
-              </TabsTrigger>
-              <TabsTrigger
-                value="audience"
-                className="data-[state=active]:bg-primary/10 px-3 py-1.5 text-xs"
-              >
-                Target Audience
-              </TabsTrigger>
-              <TabsTrigger
-                value="competition"
-                className="data-[state=active]:bg-primary/10 px-3 py-1.5 text-xs"
-              >
-                Competition
-              </TabsTrigger>
-            </TabsList>
+        {/* Competition Section */}
+        <CollapsibleSection title="Competition">
+          {/* Market Position Overview */}
+          <div className="mb-6">
+            <h4 className="text-xs font-medium mb-3 text-muted-foreground uppercase tracking-wider">Market Position</h4>
+            <div className="grid grid-cols-3 gap-4 p-3 bg-muted/40 rounded-lg border">
+              <div>
+                <h4 className="text-sm font-medium mb-2 text-foreground">Advantages</h4>
+                <BulletList items={competition.marketPosition.uniqueAdvantages} />
+              </div>
 
-            <TabsContent value="market" className="mt-0 px-1 space-y-4">
-              <div className="space-y-4">
-                {/* Market Overview */}
-                <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground">
-                    {data.summary.productSummary.overview}
-                  </p>
-                  <div className="mt-4">
-                    <h4 className="text-xs font-medium mb-2">Key Insights</h4>
-                    <div className="space-y-2">
-                      {data.summary.productSummary.keyInsights.map(
-                        (insight, index) => (
-                          <p
-                            key={index}
-                            className="text-sm text-muted-foreground"
-                          >
-                            • {insight}
-                          </p>
-                        ),
-                      )}
+              <div>
+                <h4 className="text-sm font-medium mb-2 text-foreground">Challenges</h4>
+                <BulletList items={competition.marketPosition.challenges} />
+              </div>
+
+              <div>
+                <h4 className="text-sm font-medium mb-2 text-foreground">Opportunities</h4>
+                <BulletList items={competition.marketPosition.opportunities} />
+              </div>
+            </div>
+          </div>
+
+          {/* Direct Competitors */}
+          <div className="mb-6">
+            <h4 className="text-xs font-medium mb-3 text-muted-foreground uppercase tracking-wider">Direct Competitors</h4>
+            <div className="space-y-3">
+              {competition.directCompetitors.map((competitor, index) => (
+                <div key={index} className="p-3 bg-muted/40 rounded-lg border">
+                  <div className="flex items-center justify-between mb-3">
+                    <div>
+                      <h3 className="text-sm font-medium text-foreground">{competitor.name}</h3>
+                      <Badge variant="outline" className="text-[10px] mt-1">{competitor.pricePoint}</Badge>
+                    </div>
+                    <Badge variant="secondary" className="text-[10px]">Direct Competitor</Badge>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <h4 className="text-xs font-medium mb-2 text-muted-foreground">Strengths</h4>
+                      <BulletList items={competitor.strengths} />
+                    </div>
+
+                    <div>
+                      <h4 className="text-xs font-medium mb-2 text-muted-foreground">Weaknesses</h4>
+                      <BulletList items={competitor.weaknesses} />
                     </div>
                   </div>
                 </div>
+              ))}
+            </div>
+          </div>
 
-                {/* Secondary Markets */}
-                <div className="space-y-3">
-                  <h3 className="text-sm font-medium">Secondary Markets</h3>
-                  <div className="grid gap-2">
-                    {data.summary.detailedAnalysis.market.secondaryMarkets.map(
-                      (market, index) => (
-                        <div
-                          key={index}
-                          className="p-3 bg-muted/50 rounded-lg border"
-                        >
-                          <h4 className="text-sm font-medium mb-1">
-                            {market.segment}
-                          </h4>
-                          <p className="text-sm text-muted-foreground">
-                            {market.opportunity}
-                          </p>
-                        </div>
-                      ),
-                    )}
+          {/* Indirect Competitors */}
+          <div>
+            <h4 className="text-xs font-medium mb-3 text-muted-foreground uppercase tracking-wider">Indirect Competitors</h4>
+            <div className="space-y-3">
+              {competition.indirectCompetitors.map((competitor, index) => (
+                <div key={index} className="p-3 bg-muted/40 rounded-lg border">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-sm font-medium text-foreground">{competitor.name}</h3>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className="text-[10px]">{competitor.threatLevel}</Badge>
+                      <Badge variant="secondary" className="text-[10px]">Indirect</Badge>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap gap-1.5 mt-3">
+                    {competitor.differentiators.map((diff, i) => (
+                      <Badge key={i} variant="outline" className="text-[10px]">{diff}</Badge>
+                    ))}
                   </div>
                 </div>
-
-                {/* Use Cases */}
-                <div className="space-y-3">
-                  <h3 className="text-sm font-medium">Use Cases</h3>
-                  <div className="grid gap-2">
-                    {data.summary.detailedAnalysis.market.useCases.map(
-                      (useCase, index) => (
-                        <div
-                          key={index}
-                          className="p-3 bg-muted/50 rounded-lg border"
-                        >
-                          <h4 className="text-sm font-medium mb-2">
-                            {useCase.scenario}
-                          </h4>
-                          <div className="space-y-1">
-                            {useCase.benefits.map((benefit, i) => (
-                              <p
-                                key={i}
-                                className="text-sm text-muted-foreground"
-                              >
-                                • {benefit}
-                              </p>
-                            ))}
-                          </div>
-                        </div>
-                      ),
-                    )}
-                  </div>
-                </div>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="audience" className="mt-0 px-1 space-y-3">
-              {/* Primary Market */}
-              <div className="p-3 bg-muted/50 rounded-lg border space-y-2.5">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-xs font-medium">Primary Market</h3>
-                  <Badge variant="outline" className="text-[10px]">
-                    {
-                      data.summary.detailedAnalysis.market.primaryMarket
-                        .marketSize
-                    }
-                  </Badge>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex flex-wrap gap-1.5">
-                    {data.summary.detailedAnalysis.market.primaryMarket.demographics.map(
-                      (demo, i) => (
-                        <Badge
-                          key={i}
-                          variant="secondary"
-                          className="text-[10px]"
-                        >
-                          {demo}
-                        </Badge>
-                      ),
-                    )}
-                  </div>
-                  <div className="flex flex-wrap gap-1.5">
-                    {data.summary.detailedAnalysis.market.primaryMarket.psychographics.map(
-                      (psycho, i) => (
-                        <Badge
-                          key={i}
-                          variant="outline"
-                          className="text-[10px]"
-                        >
-                          {psycho}
-                        </Badge>
-                      ),
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Secondary Markets */}
-              <div className="space-y-2">
-                {data.summary.detailedAnalysis.market.secondaryMarkets.map(
-                  (market, index) => (
-                    <div
-                      key={index}
-                      className="p-3 bg-muted/50 rounded-lg border space-y-2.5"
-                    >
-                      <div className="flex items-center justify-between">
-                        <h3 className="text-xs font-medium">
-                          {market.segment}
-                        </h3>
-                        <Badge variant="outline" className="text-[10px]">
-                          Secondary Market
-                        </Badge>
-                      </div>
-                      <p className="text-xs text-muted-foreground">
-                        {market.opportunity}
-                      </p>
-                    </div>
-                  ),
-                )}
-              </div>
-
-              {/* User Personas */}
-              <div className="grid gap-2">
-                {data.summary.detailedAnalysis.market.userPersonas.map(
-                  (persona, index) => (
-                    <div
-                      key={index}
-                      className="p-3 bg-muted/50 rounded-lg border space-y-2"
-                    >
-                      <div className="flex items-center justify-between">
-                        <h3 className="text-xs font-medium">{persona.type}</h3>
-                        <Badge variant="outline" className="text-[10px]">
-                          Persona
-                        </Badge>
-                      </div>
-                      <p className="text-xs text-muted-foreground">
-                        {persona.description}
-                      </p>
-                      <div className="flex flex-wrap gap-1.5">
-                        {persona.needs.map((need, i) => (
-                          <Badge
-                            key={i}
-                            variant="secondary"
-                            className="text-[10px]"
-                          >
-                            {need}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  ),
-                )}
-              </div>
-            </TabsContent>
-
-            <TabsContent value="competition" className="mt-0 px-1 space-y-3">
-              {/* Market Position Overview */}
-              <div className="p-3 bg-muted/50 rounded-lg border">
-                <div className="grid grid-cols-3 gap-3">
-                  <div>
-                    <h4 className="text-[11px] font-medium text-muted-foreground mb-2">
-                      Advantages
-                    </h4>
-                    <div className="flex flex-col gap-1.5">
-                      {data.summary.detailedAnalysis.competition.marketPosition.uniqueAdvantages.map(
-                        (advantage, i) => (
-                          <span
-                            key={i}
-                            className="text-xs text-muted-foreground"
-                          >
-                            • {advantage}
-                          </span>
-                        ),
-                      )}
-                    </div>
-                  </div>
-                  <div>
-                    <h4 className="text-[11px] font-medium text-muted-foreground mb-2">
-                      Challenges
-                    </h4>
-                    <div className="flex flex-col gap-1.5">
-                      {data.summary.detailedAnalysis.competition.marketPosition.challenges.map(
-                        (challenge, i) => (
-                          <span
-                            key={i}
-                            className="text-xs text-muted-foreground"
-                          >
-                            • {challenge}
-                          </span>
-                        ),
-                      )}
-                    </div>
-                  </div>
-                  <div>
-                    <h4 className="text-[11px] font-medium text-muted-foreground mb-2">
-                      Opportunities
-                    </h4>
-                    <div className="flex flex-col gap-1.5">
-                      {data.summary.detailedAnalysis.competition.marketPosition.opportunities.map(
-                        (opportunity, i) => (
-                          <span
-                            key={i}
-                            className="text-xs text-muted-foreground"
-                          >
-                            • {opportunity}
-                          </span>
-                        ),
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Direct Competitors */}
-              <div className="space-y-2">
-                {data.summary.detailedAnalysis.competition.directCompetitors.map(
-                  (competitor, index) => (
-                    <div
-                      key={index}
-                      className="p-3 bg-muted/50 rounded-lg border space-y-3"
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="space-y-1">
-                          <h3 className="text-xs font-medium">
-                            {competitor.name}
-                          </h3>
-                          <Badge variant="outline" className="text-[10px]">
-                            {competitor.pricePoint}
-                          </Badge>
-                        </div>
-                        <Badge variant="secondary" className="text-[10px]">
-                          Direct Competitor
-                        </Badge>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-3">
-                        <div>
-                          <h4 className="text-[11px] font-medium text-muted-foreground mb-1.5">
-                            Strengths
-                          </h4>
-                          <div className="flex flex-col gap-1">
-                            {competitor.strengths.map((strength, i) => (
-                              <span
-                                key={i}
-                                className="text-xs text-muted-foreground"
-                              >
-                                • {strength}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                        <div>
-                          <h4 className="text-[11px] font-medium text-muted-foreground mb-1.5">
-                            Weaknesses
-                          </h4>
-                          <div className="flex flex-col gap-1">
-                            {competitor.weaknesses.map((weakness, i) => (
-                              <span
-                                key={i}
-                                className="text-xs text-muted-foreground"
-                              >
-                                • {weakness}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ),
-                )}
-              </div>
-
-              {/* Indirect Competitors */}
-              <div className="space-y-2">
-                {data.summary.detailedAnalysis.competition.indirectCompetitors.map(
-                  (competitor, index) => (
-                    <div
-                      key={index}
-                      className="p-3 bg-muted/50 rounded-lg border space-y-2"
-                    >
-                      <div className="flex items-center justify-between">
-                        <h3 className="text-xs font-medium">
-                          {competitor.name}
-                        </h3>
-                        <div className="flex items-center gap-2">
-                          <Badge variant="outline" className="text-[10px]">
-                            {competitor.threatLevel}
-                          </Badge>
-                          <Badge variant="secondary" className="text-[10px]">
-                            Indirect
-                          </Badge>
-                        </div>
-                      </div>
-                      <div className="flex flex-wrap gap-1.5">
-                        {competitor.differentiators.map((diff, i) => (
-                          <Badge
-                            key={i}
-                            variant="outline"
-                            className="text-[10px]"
-                          >
-                            {diff}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  ),
-                )}
-              </div>
-            </TabsContent>
-          </Tabs>
-        </>
-      )}
-
-      {data !== undefined && (
-        <Button
-          onClick={onNextStep}
-          className={cn(
-            "w-full bg-fuchsia-500 text-white",
-            "hover:bg-fuchsia-600",
-            "focus-visible:ring-2 focus-visible:ring-sidebar-ring focus-visible:outline-none",
-          )}
-        >
-          Explore influencers
-        </Button>
-      )}
+              ))}
+            </div>
+          </div>
+        </CollapsibleSection>
+      </div>
     </div>
   );
 }

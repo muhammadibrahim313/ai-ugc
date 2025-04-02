@@ -4,11 +4,7 @@ import { ProductGallery } from "./components/product-gallery";
 import { ProductInfo } from "./components/product-info";
 import { useProductContext } from "../../contexts/product-context";
 
-export type ProductViewProps = {
-  onNextStep: () => void;
-};
-
-export function ProductView({ onNextStep }: ProductViewProps) {
+export function ProductView() {
   const {
     product: { refetch, data },
   } = useProductContext();
@@ -18,12 +14,12 @@ export function ProductView({ onNextStep }: ProductViewProps) {
   }, [refetch]);
 
   return (
-    <div className="grid grid-cols-5 gap-8 bg-background/30 rounded-lg border-none">
-      <div className="col-span-2">
+    <div className="grid grid-cols-1 md:grid-cols-12 gap-y-8 md:gap-x-10 bg-background/40 rounded-lg">
+      <div className="md:col-span-5">
         <ProductGallery images={data?.top3ImageUrls} />
       </div>
-      <div className="col-span-3">
-        <ProductInfo product={data} onNextStep={onNextStep} />
+      <div className="md:col-span-7">
+        <ProductInfo product={data} />
       </div>
     </div>
   );

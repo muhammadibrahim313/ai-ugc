@@ -177,7 +177,7 @@ const defineStepper = <const Steps extends Stepperize.Step[]>(
               currentStep={stepIndex + 1}
               totalSteps={steps.length}
             />
-            <div className="stepper-step-content flex flex-col items-start gap-1">
+            <div className="stepper-step-content flex flex-col items-start gap-0.5">
               {title}
               {description}
             </div>
@@ -189,7 +189,7 @@ const defineStepper = <const Steps extends Stepperize.Step[]>(
         <>
           <li
             className={cn([
-              "stepper-step group peer relative flex items-center gap-2",
+              "stepper-step group peer relative flex items-center gap-3",
               "data-[variant=vertical]:flex-row",
               "data-[label-orientation=vertical]:w-full",
               "data-[label-orientation=vertical]:flex-col",
@@ -205,7 +205,7 @@ const defineStepper = <const Steps extends Stepperize.Step[]>(
               type="button"
               role="tab"
               tabIndex={dataState !== "inactive" ? 0 : -1}
-              className="stepper-step-indicator rounded-full"
+              className="stepper-step-indicator rounded-sm h-5 w-5 min-w-5 p-0"
               variant={dataState !== "inactive" ? "default" : "secondary"}
               size="icon"
               aria-controls={`step-panel-${props.of}`}
@@ -222,7 +222,7 @@ const defineStepper = <const Steps extends Stepperize.Step[]>(
               }
               {...props}
             >
-              {icon ?? stepIndex + 1}
+              <span className="text-[0.7rem]">{icon ?? stepIndex + 1}</span>
             </Button>
             {variant === "horizontal" && labelOrientation === "vertical" && (
               <StepperSeparator
@@ -249,9 +249,9 @@ const defineStepper = <const Steps extends Stepperize.Step[]>(
           )}
 
           {variant === "vertical" && (
-            <div className="flex gap-4">
+            <div className="flex gap-3">
               {!isLast && (
-                <div className="flex justify-center ps-5">
+                <div className="flex justify-center ps-4">
                   <StepperSeparator
                     orientation="vertical"
                     isLast={isLast}
@@ -260,7 +260,7 @@ const defineStepper = <const Steps extends Stepperize.Step[]>(
                   />
                 </div>
               )}
-              <div className="my-3 flex-1 ps-4">{panel}</div>
+              <div className="my-2 flex-1 ps-3">{panel}</div>
             </div>
           )}
         </>
@@ -380,13 +380,11 @@ const StepperSeparator = ({
 const CircleStepIndicator = ({
   currentStep,
   totalSteps,
-  size = 80,
-  strokeWidth = 3,
+  size = 28,
+  strokeWidth = 1.5,
 }: CircleStepIndicatorProps) => {
-  const radius = (size - strokeWidth) / 2;
-  const circumference = radius * 2 * Math.PI;
   const fillPercentage = (currentStep / totalSteps) * 100;
-  const dashOffset = circumference - (circumference * fillPercentage) / 100;
+
   return (
     <div
       role="progressbar"
@@ -398,31 +396,30 @@ const CircleStepIndicator = ({
     >
       <svg width={size} height={size}>
         <title>Step Indicator</title>
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
+        <rect
+          x={strokeWidth / 2}
+          y={strokeWidth / 2}
+          width={size - strokeWidth}
+          height={size - strokeWidth}
+          rx={2}
           fill="none"
           stroke="currentColor"
           strokeWidth={strokeWidth}
           className="text-muted-foreground"
         />
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={strokeWidth}
-          strokeDasharray={circumference}
-          strokeDashoffset={dashOffset}
+        <rect
+          x={strokeWidth / 2}
+          y={strokeWidth / 2}
+          width={size - strokeWidth}
+          height={(size - strokeWidth) * (fillPercentage / 100)}
+          rx={2}
+          fill="currentColor"
           className="text-primary transition-all duration-300 ease-in-out"
-          transform={`rotate(-90 ${size / 2} ${size / 2})`}
         />
       </svg>
       <div className="absolute inset-0 flex items-center justify-center">
-        <span className="text-sm font-medium" aria-live="polite">
-          {currentStep} of {totalSteps}
+        <span className="text-[0.55rem] font-medium" aria-live="polite">
+          {currentStep}/{totalSteps}
         </span>
       </div>
     </div>
@@ -433,7 +430,7 @@ const CircleStepIndicator = ({
 
 //#region Styles
 
-const listVariants = cva("stepper-navigation-list flex gap-2", {
+const listVariants = cva("stepper-navigation-list flex gap-4", {
   variants: {
     variant: {
       horizontal: "flex-row items-center justify-between",

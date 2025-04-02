@@ -15,8 +15,6 @@ import util from "util";
 import { exec } from "child_process";
 import mime from "mime-types";
 
-// type ScriptRow = Database["public"]["Tables"]["scripts"]["Row"];
-
 const execPromise = util.promisify(exec);
 
 if (!process.env.HEYGEN_API_KEY) {

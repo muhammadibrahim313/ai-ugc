@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Camera, Film, MessageSquare } from "lucide-react";
+import { Camera, Film } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 export interface AdScene {
@@ -23,45 +23,39 @@ export function AdSceneCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: index * 0.1 }}
     >
-      <div className="flex flex-col md:flex-row">
-        <div className="w-full md:w-1/3 relative">
-          <div className="relative aspect-video bg-black/20">
-            <div className="absolute inset-0 flex items-center justify-center">
-              {scene.roll_type === "A-roll" ? (
-                <Camera className="w-8 h-8 text-muted-foreground/50" />
-              ) : (
-                <Film className="w-8 h-8 text-muted-foreground/50" />
-              )}
-            </div>
-            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-            <div className="absolute bottom-3 left-3 flex items-center gap-2">
-              <Badge variant={scene.roll_type === "A-roll" ? "default" : "secondary"} className="text-xs">
-                {scene.roll_type}
-              </Badge>
-            </div>
-          </div>
+      {/* Header with badge and scene number */}
+      <div className="flex items-center justify-between px-4 py-2 border-b border-sidebar-border/50 bg-muted/20">
+        <Badge
+          variant={scene.roll_type === "A-roll" ? "default" : "secondary"}
+          className="flex items-center gap-1 text-xs"
+        >
+          {scene.roll_type === "A-roll" ? (
+            <Camera className="w-3 h-3" />
+          ) : (
+            <Film className="w-3 h-3" />
+          )}
+          {scene.roll_type}
+        </Badge>
+
+        <div className="flex-shrink-0 w-6 h-6 rounded-full bg-muted flex items-center justify-center text-xs font-medium">
+          {index + 1}
+        </div>
+      </div>
+
+      {/* Content section */}
+      <div className="p-4 space-y-4">
+        <div>
+          <h3 className="text-sm font-medium mb-1 flex items-center gap-1.5">
+            Script
+          </h3>
+          <p className="text-sm">{scene.content}</p>
         </div>
 
-        <div className="w-full md:w-2/3 p-4 space-y-4">
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <MessageSquare className="w-4 h-4" />
-              <h3 className="text-sm font-medium">Script</h3>
-            </div>
-            <p className="text-sm">{scene.content}</p>
-          </div>
-
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-muted-foreground">
-              {scene.roll_type === "A-roll" ? (
-                <Camera className="w-4 h-4" />
-              ) : (
-                <Film className="w-4 h-4" />
-              )}
-              <h3 className="text-sm font-medium">Direction</h3>
-            </div>
-            <p className="text-sm text-muted-foreground">{scene.description}</p>
-          </div>
+        <div>
+          <h3 className="text-sm font-medium mb-1 flex items-center gap-1.5">
+            Direction
+          </h3>
+          <p className="text-sm text-muted-foreground">{scene.description}</p>
         </div>
       </div>
     </motion.div>
