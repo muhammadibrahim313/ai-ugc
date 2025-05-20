@@ -7,7 +7,7 @@ import path from "path";
 import os from "os";
 import { exec } from "child_process";
 import util from "util";
-import { zodResponseFormat } from "openai/helpers/zod.mjs";
+import { zodResponseFormat } from "openai/helpers/zod";
 import { BRollTimestampSchema } from "./schemas";
 const execPromise = util.promisify(exec);
 

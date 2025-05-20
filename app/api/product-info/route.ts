@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 import FirecrawlApp, { ScrapeResponse } from "@mendable/firecrawl-js";
-import { Groq } from "groq-sdk";
+import Groq from "groq-sdk";
 
 import { getSupabase } from "@/supabase/utils";
 
